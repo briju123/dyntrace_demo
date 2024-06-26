@@ -8,9 +8,11 @@
         method: POST
         return_content: yes
       register: api_response
+      
     - name: Print API response
       debug:
         msg: "API response: {{ api_response.content }}"
+        
     - name: Fail the play if the API call was not successful
       fail:
         msg: "Failed to restart the application process via API."
