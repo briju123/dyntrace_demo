@@ -1,33 +1,17 @@
 ---
-- name: Restart Backend Application Process
+- name: Restart Backend Application Process via API
   hosts: all
-  become: yes
-  vars:
-    backend_command: "/easyTravel/easytravel-2.0.0-x64/weblauncher/../CreditCardAuthorizationS64"
   tasks:
-    - name: Check if the application process is running
-      shell: pgrep -f "{{ backend_command }}"
-      register: process_status
-      ignore_errors: yes
-
-    - name: Stop the application process if running
-      shell: pkill -f "{{ backend_command }}"
-      when: process_status.rc == 0
-
-    - name: Start the application process
-      shell: "nohup {{ backend_command }} &"
-      async: 30
-      poll: 0
-
-    - name: Wait for the application process to start
-      wait_for:
-        timeout: 30
-
-    - name: Verify the application process is running
-      shell: pgrep -f "{{ backend_command }}"
-      register: verify_status
-
-    - name: Print verification status
+    - name: Restart the application process via API
+      uri:
+        url: "http://20.235.19.18:2107/restart_processremedial"
+        method: POST
+        return_content: yes
+      register: api_response
+    - name: Print API response
       debug:
-        msg: "Verification status: {{ verify_status.stdout }}"
-      failed_when: verify_status.rc != 0
+        msg: "API response: {{ api_response.content }}"
+    - name: Fail the play if the API call was not successful
+      fail:
+        msg: "Failed to restart the application process via API."
+      when: api_response.status != 200
