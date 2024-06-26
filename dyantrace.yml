@@ -1,6 +1,6 @@
 ---
 - name: Restart Backend Application Process via API
-  hosts: all
+  hosts: localhost
   tasks:
     - name: Restart the application process via API
       uri:
